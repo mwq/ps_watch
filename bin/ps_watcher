@@ -17,20 +17,22 @@ class PsWatcher
 
   def assert path
     unless @zk.exists? path
-     @zk.create path
-     end
+      @zk.create path
+    end
   end 
 
   def created(pid)
-   cmdline = File.open("/proc/#{pid}/cmdline").read.lines.first
-   log 'new process'
-   log cmdline
-   @zk.create "#{@zk_path}/#{pid}", cmdline, :ephemeral => true
+    if File.exist? "/proc/#{pid}"
+      cmdline = File.open("/proc/#{pid}/cmdline").read.lines.first
+      log 'new process'
+      log cmdline
+      @zk.create "#{@zk_path}/#{pid}", cmdline, :ephemeral => true
+    end
   end
 
   def stopped(pid)
     log "#{pid} stopped"
-   @zk.rm_rf "#{@zk_path}/#{pid}"
+    @zk.rm_rf "#{@zk_path}/#{pid}"
   end
 
   def log msg
@@ -42,22 +44,22 @@ class PsWatcher
     Dir.foreach('/proc').grep /^\d+$/
   end
 
-   def run
-     old_pids = []
-     loop do
-       current_pids = pids
+  def run
+    old_pids = []
+    loop do
+      current_pids = pids
 
-       stopped_pids = old_pids - current_pids
-       stopped_pids.each{|pid| stopped(pid)}
+      stopped_pids = old_pids - current_pids
+      stopped_pids.each{|pid| stopped(pid)}
 
-       created_pids = current_pids - old_pids
-       created_pids.each{|pid| created(pid)}
+      created_pids = current_pids - old_pids
+      created_pids.each{|pid| created(pid)}
 
-       old_pids = current_pids
-       sleep 3
-     end
-   end
+      old_pids = current_pids
+      sleep 3
+    end
+  end
 end
-Daemons.run_proc('ps_watcher') do
+Daemons.run_proc('ps_watcher' :log_output => true) do
   PsWatcher.new.run
 end
