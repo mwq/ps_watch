@@ -1,2 +1,3 @@
-require 'zk'
-require 'daemons'
+source :rubygems
+gem 'zk'
+gem 'daemons'
