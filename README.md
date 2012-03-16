@@ -24,6 +24,6 @@ run ```rackup``` (or use some other rackisch server)
 
 The startup will take a while if you have many servers with the agent on, but after the server has started updates should be nearly instant.
 
-```curl localhost:9292``` will give you a nice json blob all the processes on all systems.
+```curl localhost:9292``` will give you a nice json blob with all the processes on all systems.
 
 
