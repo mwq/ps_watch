@@ -60,6 +60,6 @@ class PsWatcher
     end
   end
 end
-Daemons.run_proc('ps_watcher' :log_output => true) do
+Daemons.run_proc('ps_watcher', :log_output => true) do
   PsWatcher.new.run
 end
